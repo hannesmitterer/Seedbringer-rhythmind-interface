@@ -5,6 +5,8 @@ const { google } = require('googleapis');
 const http = require('http');
 const socketIO = require('socket.io');
 const path = require('path');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 
 const app = express();
 const server = http.createServer(app);
@@ -16,6 +18,23 @@ const AUTHORIZED_EMAILS = process.env.AUTHORIZED_EMAILS
   ? process.env.AUTHORIZED_EMAILS.split(',').map(email => email.trim())
   : [];
 
+// Security middleware
+app.use(helmet({
+  contentSecurityPolicy: false // Disable for Socket.IO compatibility
+}));
+
+// Rate limiting
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each IP to 5 auth requests per windowMs
+  message: 'Too many authentication attempts, please try again later'
+});
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100 // Limit each IP to 100 API requests per windowMs
+});
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -23,7 +42,11 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'seedbringer-session-secret',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: process.env.NODE_ENV === 'production' }
+  cookie: { 
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    sameSite: 'lax'
+  }
 }));
 
 // Serve static files
@@ -55,8 +78,8 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Initiate Google OAuth
-app.get('/auth/google', (req, res) => {
+// Initiate Google OAuth (with rate limiting)
+app.get('/auth/google', authLimiter, (req, res) => {
   const scopes = [
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/userinfo.profile'
@@ -71,8 +94,8 @@ app.get('/auth/google', (req, res) => {
   res.redirect(url);
 });
 
-// OAuth callback
-app.get('/auth/google/callback', async (req, res) => {
+// OAuth callback (with rate limiting)
+app.get('/auth/google/callback', authLimiter, async (req, res) => {
   const { code } = req.query;
 
   if (!code) {
@@ -114,13 +137,13 @@ app.get('/auth/google/callback', async (req, res) => {
   }
 });
 
-// Get current user
-app.get('/api/user', requireAuth, (req, res) => {
+// Get current user (with rate limiting)
+app.get('/api/user', apiLimiter, requireAuth, (req, res) => {
   res.json({ user: req.session.user });
 });
 
-// Logout
-app.post('/api/logout', (req, res) => {
+// Logout (with rate limiting)
+app.post('/api/logout', apiLimiter, (req, res) => {
   const userId = req.session.user?.id;
   if (userId) {
     activeSessions.delete(userId);
@@ -129,8 +152,8 @@ app.post('/api/logout', (req, res) => {
   res.json({ success: true });
 });
 
-// Get active sessions (admin only - simplified version)
-app.get('/api/sessions', requireAuth, (req, res) => {
+// Get active sessions (with rate limiting)
+app.get('/api/sessions', apiLimiter, requireAuth, (req, res) => {
   const sessions = Array.from(activeSessions.values()).map(session => ({
     email: session.user.email,
     name: session.user.name,
@@ -139,8 +162,8 @@ app.get('/api/sessions', requireAuth, (req, res) => {
   res.json({ sessions });
 });
 
-// Send message to all connected users
-app.post('/api/broadcast', requireAuth, (req, res) => {
+// Send message to all connected users (with rate limiting)
+app.post('/api/broadcast', apiLimiter, requireAuth, (req, res) => {
   const { message } = req.body;
   const sender = req.session.user;
 
