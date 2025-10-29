@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seedbringer Rhythmind Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .info-section, .deployment-section, .auth-section {
+            margin-bottom: 40px;
+        }
+
+        .info-section h2, .deployment-section h2, .auth-section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .info-section ul, .deployment-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .info-section li, .deployment-section li {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .deployment-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            margin: 10px 10px 10px 0;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .deployment-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 20px auto;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-login .icon {
+            font-size: 1.3em;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #c33;
+        }
+
+        .authorized-members {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+
+        .authorized-members h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .authorized-members ul {
+            list-style: none;
+        }
+
+        .authorized-members li {
+            padding: 8px 0;
+            color: #666;
+        }
+
+        .deployment-status {
+            background: #e8f5e9;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #4caf50;
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: #4caf50;
+            color: white;
+            padding: 6px 15px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin: 5px;
+        }
+
+        .status-badge.pending {
+            background: #ff9800;
+        }
+
+        footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+        }
+
+        .code-block {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px auto;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌱 Seedbringer Rhythmind Interface</h1>
+            <p class="subtitle">Secure Communication Channel for the Council</p>
+        </div>
+
+        <div class="content">
+            <div class="deployment-status">
+                <h2>🚀 Deployment Status</h2>
+                <p>
+                    <span class="status-badge">GitHub Pages</span>
+                    <span class="status-badge">Live</span>
+                </p>
+                <p style="margin-top: 10px;">This page is hosted on GitHub Pages. For full functionality with OAuth authentication, deploy to Render or Netlify.</p>
+            </div>
+
+            <div class="deployment-section">
+                <h2>Available Deployments</h2>
+                <p>Access the full application on these platforms:</p>
+                <div style="margin: 20px 0;">
+                    <a href="#render-deployment" class="deployment-link">🟢 Deploy to Render</a>
+                    <a href="#netlify-deployment" class="deployment-link">🟦 Deploy to Netlify</a>
+                    <a href="https://github.com/hannesmitterer/Seedbringer-rhythmind-interface" class="deployment-link">📦 GitHub Repository</a>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h2>About</h2>
+                <p>This is the official communication interface for the Seedbringer and Council members.</p>
+                <p><strong>Key Features:</strong></p>
+                <ul>
+                    <li>🔐 Secure Gmail OAuth 2.0 Authentication</li>
+                    <li>💬 Real-time Bidirectional Communication via WebSocket</li>
+                    <li>📡 GGI Broadcast Interface Integration</li>
+                    <li>🔒 Private Session Management with Secure Cookies</li>
+                    <li>⚡ Rate Limiting & Security Headers</li>
+                    <li>🎨 Responsive Modern Interface</li>
+                </ul>
+            </div>
+
+            <div class="deployment-section" id="render-deployment">
+                <h2>Deploy to Render (Recommended)</h2>
+                <p><strong>Render provides:</strong> Free tier, automatic HTTPS, environment variables, continuous deployment</p>
+                
+                <h3 style="color: #667eea; margin-top: 20px;">Quick Deploy Steps:</h3>
+                <ol style="line-height: 2;">
+                    <li>Click "New +" → "Web Service" at <a href="https://render.com" target="_blank">render.com</a></li>
+                    <li>Connect your GitHub repository</li>
+                    <li>Render will auto-detect the <code>render.yaml</code> configuration</li>
+                    <li>Add environment variables in Render dashboard:
+                        <div class="code-block">
+GOOGLE_CLIENT_ID=your_client_id<br>
+GOOGLE_CLIENT_SECRET=your_client_secret<br>
+AUTHORIZED_EMAILS=hannes.mitterer@gmail.com,alfred.mitterer@gmail.com,...
+                        </div>
+                    </li>
+                    <li>Update Google OAuth redirect URI to: <code>https://your-app.onrender.com/auth/google/callback</code></li>
+                    <li>Click "Create Web Service"</li>
+                </ol>
+                <p><strong>Your app will be live at:</strong> <code>https://seedbringer-interface.onrender.com</code></p>
+            </div>
+
+            <div class="deployment-section" id="netlify-deployment">
+                <h2>Deploy to Netlify (Alternative)</h2>
+                <p><strong>Note:</strong> Netlify is best for static sites. For full OAuth functionality, use Render.</p>
+                
+                <h3 style="color: #667eea; margin-top: 20px;">Static Deployment (Information Only):</h3>
+                <ol style="line-height: 2;">
+                    <li>Go to <a href="https://netlify.com" target="_blank">netlify.com</a></li>
+                    <li>Click "Add new site" → "Import an existing project"</li>
+                    <li>Connect GitHub and select your repository</li>
+                    <li>Netlify will use the <code>netlify.toml</code> configuration</li>
+                    <li>Click "Deploy site"</li>
+                </ol>
+                <p><strong>Note:</strong> This deploys only static files (GitHub Pages style). Backend features require serverless functions or use Render instead.</p>
+            </div>
+
+            <div class="auth-section">
+                <h2>Full Application Access</h2>
+                <p>To access the full OAuth-authenticated communication interface:</p>
+                <ol style="line-height: 2; margin-left: 20px;">
+                    <li>Deploy to Render using instructions above</li>
+                    <li>Configure Google OAuth credentials</li>
+                    <li>Navigate to your deployed URL</li>
+                    <li>Sign in with authorized Gmail account</li>
+                </ol>
+                <p style="margin-top: 15px;"><strong>Authorized Council Members:</strong></p>
+            </div>
+
+            <div class="authorized-members">
+                <h3>Authorized Email Addresses</h3>
+                <ul>
+                    <li>hannes.mitterer@gmail.com</li>
+                    <li>alfred.mitterer@gmail.com</li>
+                    <li>consultant.laquila@gmail.com</li>
+                    <li>dietmar.zuegg@gmail.com</li>
+                    <li>sensisara81@gmail.com</li>
+                    <li>cranedeathrow007@gmail.com</li>
+                    <li>claudiocalabrese@gmx.com</li>
+                </ul>
+            </div>
+
+            <div class="info-section">
+                <h2>Documentation</h2>
+                <p>Complete documentation available in the repository:</p>
+                <ul>
+                    <li>📖 <strong>README.md</strong> - Quick start and overview</li>
+                    <li>⚙️ <strong>SETUP.md</strong> - Detailed configuration guide</li>
+                    <li>🔌 <strong>API.md</strong> - API endpoints and WebSocket events</li>
+                    <li>🚀 <strong>DEPLOYMENT.md</strong> - Comprehensive deployment instructions</li>
+                    <li>🔒 <strong>SECURITY.md</strong> - Security analysis and best practices</li>
+                    <li>💻 <strong>examples/</strong> - Code examples and integration samples</li>
+                </ul>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2024 Seedbringer Collective | Branch: direct-channel-setup</p>
+            <p style="margin-top: 5px; font-size: 0.9em;">
+                <a href="https://github.com/hannesmitterer/Seedbringer-rhythmind-interface" style="color: #667eea; text-decoration: none;">View on GitHub</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

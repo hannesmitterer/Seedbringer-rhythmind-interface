@@ -1,0 +1,13 @@
+# Netlify configuration for static hosting
+[build]
+  publish = "public"
+  command = "echo 'Static files ready for deployment'"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = false
+
+[build.environment]
+  NODE_VERSION = "20"
