@@ -31,7 +31,12 @@ This guide provides step-by-step instructions for deploying the Seedbringer Rhyt
 
 2. **Install Node.js:**
    ```bash
-   curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+   # Download the setup script
+   curl -fsSL https://deb.nodesource.com/setup_20.x -o nodesource_setup.sh
+   # Review the script (optional but recommended)
+   cat nodesource_setup.sh
+   # Run the script
+   sudo -E bash nodesource_setup.sh
    sudo apt install -y nodejs
    ```
 
@@ -62,7 +67,8 @@ This guide provides step-by-step instructions for deploying the Seedbringer Rhyt
    GOOGLE_CLIENT_SECRET=your_production_client_secret
    GOOGLE_REDIRECT_URI=https://yourdomain.com/auth/google/callback
    SESSION_SECRET=your_secure_random_secret
-   AUTHORIZED_EMAILS=hannes.mitterer@gmail.com,alfred.mitterer@gmail.com,...
+   # Configure authorized email addresses for your deployment
+   AUTHORIZED_EMAILS=user1@gmail.com,user2@gmail.com,user3@gmail.com
    ```
 
 6. **Install PM2:**
@@ -150,7 +156,8 @@ This guide provides step-by-step instructions for deploying the Seedbringer Rhyt
    heroku config:set GOOGLE_CLIENT_SECRET=your_client_secret
    heroku config:set GOOGLE_REDIRECT_URI=https://seedbringer-interface.herokuapp.com/auth/google/callback
    heroku config:set SESSION_SECRET=$(openssl rand -hex 32)
-   heroku config:set AUTHORIZED_EMAILS=hannes.mitterer@gmail.com,alfred.mitterer@gmail.com,...
+   # Set authorized emails - replace with actual authorized accounts
+   heroku config:set AUTHORIZED_EMAILS=user1@gmail.com,user2@gmail.com,user3@gmail.com
    ```
 
 5. **Create Procfile:**

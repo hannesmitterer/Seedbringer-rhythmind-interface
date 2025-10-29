@@ -20,8 +20,12 @@ try {
   assert(server, 'Server should be loaded');
   console.log('✓ Server module loaded successfully\n');
   
-  // Close the server
-  server.close();
+  // Close the server properly
+  if (server.listening) {
+    server.close();
+  } else {
+    server.on('listening', () => server.close());
+  }
 } catch (error) {
   console.error('✗ Failed to load server:', error.message);
   process.exit(1);
@@ -111,7 +115,9 @@ try {
   
   // Check CSS file exists and has content
   const css = fs.readFileSync(path.join(__dirname, '../public/css/styles.css'), 'utf8');
-  assert(css.length > 1000, 'CSS file should have substantial content');
+  assert(css.includes('.dashboard-container'), 'CSS should contain dashboard styles');
+  assert(css.includes('.message'), 'CSS should contain message styles');
+  assert(css.includes('.btn-login'), 'CSS should contain button styles');
   
   console.log('✓ Static files are valid\n');
 } catch (error) {
