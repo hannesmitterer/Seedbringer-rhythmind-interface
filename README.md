@@ -2,6 +2,12 @@
 
 A secure, real-time communication platform with Gmail OAuth 2.0 authentication and bidirectional messaging capabilities, designed for the Seedbringer and Council members.
 
+## 🚀 Live Deployments
+
+- **📄 GitHub Pages:** [View Documentation](https://hannesmitterer.github.io/Seedbringer-rhythmind-interface/)
+- **🟢 Render:** Deploy the full application → See [DEPLOY_INSTRUCTIONS.md](DEPLOY_INSTRUCTIONS.md)
+- **🟦 Netlify:** Static hosting option → See [DEPLOY_INSTRUCTIONS.md](DEPLOY_INSTRUCTIONS.md)
+
 ## 🌟 Features
 
 - **🔐 Secure Gmail OAuth 2.0 Authentication** - Zero-friction authentication with no password management
@@ -61,9 +67,31 @@ A secure, real-time communication platform with Gmail OAuth 2.0 authentication a
 
 See [SETUP.md](SETUP.md) for detailed configuration instructions.
 
+## 🚀 Deployment
+
+**Quick Deploy Options:**
+
+### Production Deployment (Render - Recommended)
+```bash
+# Automated deployment with render.yaml
+1. Push to GitHub
+2. Connect to Render
+3. Add environment variables
+4. Deploy automatically
+```
+
+### Static Documentation (GitHub Pages)
+Already configured! Automatically deploys to:
+```
+https://hannesmitterer.github.io/Seedbringer-rhythmind-interface/
+```
+
+**📖 Complete Instructions:** See [DEPLOY_INSTRUCTIONS.md](DEPLOY_INSTRUCTIONS.md)
+
 ## 📚 Documentation
 
 - **[Setup Guide](SETUP.md)** - Complete setup and configuration instructions
+- **[Deployment Instructions](DEPLOY_INSTRUCTIONS.md)** - Step-by-step deployment guide
 - **[API Documentation](API.md)** - REST API and WebSocket API reference
 - **[Examples](examples/README.md)** - Code examples and integration guides
 

@@ -1,0 +1,22 @@
+# Render deployment configuration
+services:
+  - type: web
+    name: seedbringer-interface
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: AUTHORIZED_EMAILS
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        value: https://seedbringer-interface.onrender.com/auth/google/callback
