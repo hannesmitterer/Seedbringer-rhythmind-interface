@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Seedbringer Interface</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>🌱 Seedbringer Communication Dashboard</h1>
+            <div class="user-info">
+                <img id="user-avatar" src="" alt="User Avatar" class="avatar">
+                <span id="user-name"></span>
+                <button onclick="logout()" class="btn-logout">Logout</button>
+            </div>
+        </div>
+
+        <div class="dashboard-content">
+            <div class="sidebar">
+                <h3>Active Sessions</h3>
+                <div id="active-sessions" class="sessions-list">
+                    Loading...
+                </div>
+            </div>
+
+            <div class="main-panel">
+                <div class="communication-area">
+                    <h2>Bidirectional Communication Channel</h2>
+                    <div id="messages-container" class="messages-container">
+                        <!-- Messages will appear here -->
+                    </div>
+                    
+                    <div class="message-input-area">
+                        <textarea 
+                            id="message-input" 
+                            placeholder="Type your message here..."
+                            rows="3"
+                        ></textarea>
+                        <button onclick="sendMessage()" class="btn-send">Send Message</button>
+                    </div>
+                </div>
+
+                <div class="info-panel">
+                    <h3>Connection Status</h3>
+                    <div id="connection-status" class="status">
+                        <span class="status-indicator"></span>
+                        <span id="status-text">Connecting...</span>
+                    </div>
+                    
+                    <h3>Euystacio GGI Broadcast</h3>
+                    <p>Integration Status: <span class="badge">Ready</span></p>
+                    <p class="info-text">The communication interface is linked to the Euystacio GGI Broadcast system for enhanced functionality.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        let socket;
+        let currentUser = null;
+
+        // Initialize dashboard
+        async function init() {
+            try {
+                // Get current user
+                const response = await fetch('/api/user');
+                const data = await response.json();
+                currentUser = data.user;
+                
+                // Update UI with user info
+                document.getElementById('user-name').textContent = currentUser.name;
+                document.getElementById('user-avatar').src = currentUser.picture;
+                
+                // Initialize WebSocket
+                initializeWebSocket();
+                
+                // Load active sessions
+                loadActiveSessions();
+                
+            } catch (error) {
+                console.error('Initialization error:', error);
+                window.location.href = '/';
+            }
+        }
+
+        // Initialize WebSocket connection
+        function initializeWebSocket() {
+            socket = io();
+            
+            socket.on('connect', () => {
+                console.log('WebSocket connected');
+                updateConnectionStatus(true);
+                socket.emit('authenticate', currentUser.id);
+            });
+            
+            socket.on('disconnect', () => {
+                console.log('WebSocket disconnected');
+                updateConnectionStatus(false);
+            });
+            
+            socket.on('message', (data) => {
+                displayMessage(data);
+            });
+            
+            socket.on('user_joined', (user) => {
+                displaySystemMessage(`${user.name} joined the channel`);
+                loadActiveSessions();
+            });
+            
+            socket.on('user_left', (user) => {
+                displaySystemMessage(`${user.name} left the channel`);
+                loadActiveSessions();
+            });
+        }
+
+        // Update connection status
+        function updateConnectionStatus(connected) {
+            const statusElement = document.getElementById('status-text');
+            const indicator = document.querySelector('.status-indicator');
+            
+            if (connected) {
+                statusElement.textContent = 'Connected';
+                indicator.classList.add('connected');
+            } else {
+                statusElement.textContent = 'Disconnected';
+                indicator.classList.remove('connected');
+            }
+        }
+
+        // Load active sessions
+        async function loadActiveSessions() {
+            try {
+                const response = await fetch('/api/sessions');
+                const data = await response.json();
+                
+                const sessionsElement = document.getElementById('active-sessions');
+                if (data.sessions.length === 0) {
+                    sessionsElement.innerHTML = '<p class="no-sessions">No active sessions</p>';
+                } else {
+                    sessionsElement.innerHTML = data.sessions.map(session => `
+                        <div class="session-item">
+                            <div class="session-name">${session.name}</div>
+                            <div class="session-email">${session.email}</div>
+                            <div class="session-time">${formatTime(session.connectedAt)}</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading sessions:', error);
+            }
+        }
+
+        // Send message
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const message = input.value.trim();
+            
+            if (message) {
+                socket.emit('send_message', { message });
+                input.value = '';
+            }
+        }
+
+        // Display message
+        function displayMessage(data) {
+            const container = document.getElementById('messages-container');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            
+            const isOwnMessage = data.sender.email === currentUser.email;
+            if (isOwnMessage) {
+                messageDiv.classList.add('own-message');
+            }
+            
+            messageDiv.innerHTML = `
+                <div class="message-header">
+                    <strong>${data.sender.name}</strong>
+                    <span class="message-time">${formatTime(data.timestamp)}</span>
+                </div>
+                <div class="message-body">${escapeHtml(data.message)}</div>
+            `;
+            
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Display system message
+        function displaySystemMessage(text) {
+            const container = document.getElementById('messages-container');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message system-message';
+            messageDiv.textContent = text;
+            
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Logout
+        async function logout() {
+            try {
+                await fetch('/api/logout', { method: 'POST' });
+                window.location.href = '/';
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
+
+        // Utility functions
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Allow Enter to send message (Shift+Enter for new line)
+        document.addEventListener('DOMContentLoaded', () => {
+            const input = document.getElementById('message-input');
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+        });
+
+        // Initialize on page load
+        init();
+        
+        // Refresh sessions every 30 seconds
+        setInterval(loadActiveSessions, 30000);
+    </script>
+</body>
+</html>
