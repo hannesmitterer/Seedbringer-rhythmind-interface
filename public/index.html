@@ -1,91 +1,56 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seedbringer Rhythmind Interface - https://seedbringer-interface.onrender.com <title>
-    <link rel="stylesheet" href="/css/styles.css">
+  <meta charset="utf-8" />
+  <title>Seedbringer Rhythmind Interface — App</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin:20px; }
+    #messages { height:300px; border:1px solid #ddd; padding:8px; overflow:auto; white-space: pre-wrap; }
+    #controls { margin-top:10px; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🌱 Seedbringer Rhythmind Interface</h1>
-            <p class="subtitle">Secure Communication Channel for the Council</p>
-        </div>
+  <h3>Seedbringer Rhythmind Interface — App</h3>
+  <div id="status">Checking auth...</div>
+  <div id="controls" style="display:none">
+    <div id="messages"></div>
+    <input id="msg" placeholder="message" />
+    <button id="send">Send</button>
+  </div>
+  <script>
+    async function init() {
+      const me = await fetch('/me').then(r => r.json());
+      if (!me.authenticated) {
+        document.getElementById('status').innerHTML = '<a href="/auth/google">Sign in with Google</a>';
+        return;
+      }
+      document.getElementById('status').textContent = 'Signed in as ' + me.user.email;
+      document.getElementById('controls').style.display = 'block';
 
-        <div class="content">
-            <div class="info-section">
-                <h2>Welcome</h2>
-                <p>This is the official communication interface for the Seedbringer and Council members.</p>
-                <p>Features:</p>
-                <ul>
-                    <li>🔐 Secure Gmail OAuth 2.0 Authentication</li>
-                    <li>💬 Real-time Bidirectional Communication</li>
-                    <li>📡 GGI Broadcast Interface Integration</li>
-                    <li>🔒 Private Session Management</li>
-                </ul>
-            </div>
+      function getCookie(name) {
+        const v = document.cookie.match('(^|;)\s*' + name + '\s*=\s*([^;]+)');
+        return v ? v.pop() : '';
+      }
+      const token = getCookie('sb_token');
+      const wsProto = location.protocol === 'https:' ? 'wss' : 'ws';
+      const ws = new WebSocket(wsProto + '://' + location.host + '/?token=' + encodeURIComponent(token));
+      const messages = document.getElementById('messages');
 
-            <div class="auth-section">
-                <h2>Authentication</h2>
-                <p>Only authorized Council members can access this interface.</p>
-                <button onclick="loginWithGoogle()" class="btn-login">
-                    <span class="icon">🔐</span>
-                    Sign in with Gmail
-                </button>
-            </div>
+      ws.onopen = () => messages.appendChild(document.createTextNode('[connected]\n'));
+      ws.onmessage = (ev) => {
+        const obj = JSON.parse(ev.data);
+        const line = document.createElement('div');
+        line.textContent = `${obj.ts} — ${obj.from}: ${JSON.stringify(obj.payload)}`;
+        messages.appendChild(line);
+      };
 
-            <div id="error-message" class="error-message" style="display: none;"></div>
-
-            <div class="authorized-members">
-                <h3>Authorized Members</h3>
-                <ul>
-                    <li>hannes.mitterer@gmail.com</li>
-                    <li>alfred.mitterer@gmail.com</li>
-                    <li>consultant.laquila@gmail.com</li>
-                    <li>dietmar.zuegg@gmail.com</li>
-                    <li>sensisara81@gmail.com</li>
-                    <li>cranedeathrow007@gmail.com</li>
-                    <li>claudiocalabrese@gmx.com</li>
-                </ul>
-            </div>
-        </div>
-
-        <footer>
-            <p>&copy; 2024 Seedbringer Collective | Branch: direct-channel-setup</p>
-        </footer>
-    </div>
-
-    <script>
-        function loginWithGoogle() {
-            window.location.href = '/auth/google';
-        }
-
-        // Check for error in URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const error = urlParams.get('error');
-        
-        if (error) {
-            const errorMessage = document.getElementById('error-message');
-            let message = '';
-            
-            switch(error) {
-                case 'no_code':
-                    message = 'Authentication failed: No authorization code received.';
-                    break;
-                case 'unauthorized_email':
-                    message = 'Access denied: Your email is not authorized for this interface.';
-                    break;
-                case 'auth_failed':
-                    message = 'Authentication failed: Please try again.';
-                    break;
-                default:
-                    message = 'An error occurred during authentication.';
-            }
-            
-            errorMessage.textContent = message;
-            errorMessage.style.display = 'block';
-        }
-    </script>
+      document.getElementById('send').onclick = () => {
+        const v = document.getElementById('msg').value;
+        ws.send(JSON.stringify({ type: 'message', payload: v }));
+        document.getElementById('msg').value = '';
+      };
+    }
+    init();
+  </script>
 </body>
 </html>
