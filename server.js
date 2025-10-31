@@ -22,7 +22,7 @@ const server = http.createServer(app);
 // Simple health
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
-// Start OAuth flow
+// Start OAuth flow (THIS MUST BE REGISTERED BEFORE STATIC FILES)
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 // OAuth callback
@@ -57,7 +57,7 @@ app.get('/me', (req, res) => {
   }
 });
 
-// Serve static UI (absolute path fix)
+// Serve static UI (This line must come *after* all API and Auth routes)
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Attach WebSocket server
