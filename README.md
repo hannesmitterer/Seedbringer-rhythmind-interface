@@ -6,6 +6,7 @@ A secure, real-time communication platform with Gmail OAuth 2.0 authentication a
 
 - **📄 GitHub Pages:** [View Documentation](https://hannesmitterer.github.io/Seedbringer-rhythmind-interface/)
 - **🟢 Render:** Deploy the full application → See [DEPLOY_INSTRUCTIONS.md](DEPLOY_INSTRUCTIONS.md)
+- https://seedbringer-interface.onrender.com
 - **🟦 Netlify:** Static hosting option → See [DEPLOY_INSTRUCTIONS.md](DEPLOY_INSTRUCTIONS.md)
 
 ## 🌟 Features
